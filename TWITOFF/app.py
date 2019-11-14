@@ -21,6 +21,21 @@ def create_app():
         users = User.query.all()
         return render_template('base.html',  tittle='Home')
 
+    #adding in a new route to add users or get users
+    @app.route('/user', methods=['POST'])# uses form
+    @app.route('/user/<name>', methods=['GET'])#needs parameter
+    def user(name=None, message=''):
+        try:
+            if request.method='POST':
+                add_or_update_user(name)
+                message="User {} successfully added!".format(name)
+            tweets = User.query.filter(User.name == name).one().tweets
+        except Exception as e:
+            message = "Error adding {}: {}".format(name,e)
+            tweets = []
+        return render_template('user.html', title=name, tweets=tweets,
+        message=message)
+
     @app.route('/reset')
     def reset():
         DB.drop.all()
